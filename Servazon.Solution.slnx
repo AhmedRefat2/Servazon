@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Servazon.Application/Servazon.Application.csproj" />
+  <Project Path="Servazon.Domain/Servazon.Domain.csproj" />
+  <Project Path="Servazon.Infrastructure/Servazon.Infrastructure.csproj" />
+  <Project Path="Servazon.Web/Servazon.Web.csproj" />
+</Solution>

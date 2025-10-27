@@ -17,7 +17,7 @@ namespace Servazon.Infrastructure.Data
         {
 
         }
-
+        
         #region Db Sets 
         public DbSet<ProviderProfile> ProviderProfiles { get; set; }
         public DbSet<ServiceCategory> ServiceCategories { get; set; }
@@ -45,9 +45,9 @@ namespace Servazon.Infrastructure.Data
                     entity.SetSchema("core");
             }
 
+            builder.ApplyConfigurationsFromAssembly(typeof(ServazonDbContext).Assembly); // Apply all configurations from the current assembly [Infrastructure]
 
             base.OnModelCreating(builder);
-            builder.ApplyConfigurationsFromAssembly(typeof(ServazonDbContext).Assembly); // Apply all configurations from the current assembly [Infrastructure]
         }
 
     }

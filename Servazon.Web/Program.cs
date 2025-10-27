@@ -1,11 +1,14 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Servazon.Domain.Entities;
 using Servazon.Infrastructure.Data;
+using System;
 
 namespace Servazon.Web
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -16,12 +19,21 @@ namespace Servazon.Web
             builder.Services.AddDbContext<ServazonDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("ServazonLocalConnectionString")));
 
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            {
+                options.Password.RequireDigit = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequiredLength = 6;
+            }).AddEntityFrameworkStores<ServazonDbContext>();
+
 
             #endregion
 
             var app = builder.Build();
 
-            #region Update Database - Apply Pending Migrations Automatically & Log Errors
+            #region Update Database - Apply Pending Migrations Automatically & Log Errors - Seeding 
 
 
             using var scope = app.Services.CreateScope();
@@ -32,6 +44,9 @@ namespace Servazon.Web
             {
                 var dbContext = scope.ServiceProvider.GetRequiredService<ServazonDbContext>();
                 dbContext.Database.Migrate();
+
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+                await ServazonDataSeed.SeedAsync(dbContext, userManager);
                 logger.LogInformation("Database migrated successfully.");
             }
             catch (Exception ex)
@@ -54,6 +69,8 @@ namespace Servazon.Web
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
